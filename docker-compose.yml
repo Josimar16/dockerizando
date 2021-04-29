@@ -1,0 +1,62 @@
+version: "3.7"
+
+services: 
+  database:
+    image: postgres
+    container_name: database
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=test
+    volumes:
+      - pgdata:/data/postgres
+    networks:
+      - postgres
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "mail@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "password"
+    ports:
+      - "9000:80"
+    depends_on:
+      - database
+    networks:
+      - postgres
+
+  backend: 
+    build: './backend'
+    container_name: backend
+    restart: always
+    ports: 
+      - 3333:3333
+      - 9229:9229
+    depends_on:
+      - database
+    volumes: 
+      - .:/usr/app
+    networks:
+      - postgres 
+
+  web: 
+    build: './web'
+    container_name: web
+    restart: always
+    ports: 
+      - 3000:3000
+    depends_on:
+      - backend
+    volumes: 
+      - .:/usr/app
+    networks:
+      - postgres 
+
+networks:
+  postgres:
+    name: postgres-network
