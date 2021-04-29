@@ -54,8 +54,6 @@ services:
       - backend
     volumes: 
       - .:/usr/app
-    networks:
-      - postgres 
 
 networks:
   postgres:
